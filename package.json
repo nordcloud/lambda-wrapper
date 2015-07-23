@@ -1,0 +1,24 @@
+{
+  "name": "lambda-local",
+  "version": "0.0.1",
+  "description": "Wrapper for running Amazon Lambda modules locally",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/SC5/lambda-local.git"
+  },
+  "keywords": [
+    "AWS",
+    "lambda",
+    "local"
+  ],
+  "author": "Mikael Puittinen (mikael.puittinen@sc5.io)",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/SC5/lambda-local/issues"
+  },
+  "homepage": "https://github.com/SC5/lambda-local"
+}
