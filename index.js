@@ -1,44 +1,31 @@
 // Pseudowrapper for AWS Lambda
-
 var lambdaModule;
 
-var _runner = function(event, callbackFn) {
+var _runner = function(event, callback) {
     if (!lambdaModule) {
-        return callbackFn('Module not initialized', null);
+        return callback('Module not initialized', null);
     }
 
     var lambdacontext = {
         succeed: function(success) {
-            return callbackFn(null, success);
+            return callback(null, success);
         },
         fail: function(error) {
-            return callbackFn(error, null);
+            return callback(error, null);
         }
     };
 
     try {
         lambdaModule.handler(event, lambdacontext);
     } catch (ex) {
-        callbackFn('Exception:' + ex.toString());
+        callback('Exception:' + ex.toString());
     }
 };
 
 // Public interface for the module
 module.exports = exports = {
-    init: function(modName) {
-        if (!modName) {
-            modName = '';
-        }
-
-        try {
-            lambdaModule = require(modName);
-            return this;
-        } catch (ex) {
-            lambdaModule = require(process.cwd() + '/' + modName);
-            return this;
-        }
-
-        return null;
+    init: function(mod) {
+        lambdaModule = mod;
     },
     run: _runner
 };
