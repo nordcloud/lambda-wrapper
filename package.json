@@ -1,6 +1,6 @@
 {
   "name": "lambda-wrapper",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Wrapper for running Amazon Lambda modules locally",
   "main": "index.js",
   "scripts": {
