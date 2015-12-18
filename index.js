@@ -12,6 +12,9 @@ var _runner = function(event, callback) {
         },
         fail: function(error) {
             return callback(error, null);
+        },
+        done: function(error, success) {
+            return callback(error, success);
         }
     };
 
