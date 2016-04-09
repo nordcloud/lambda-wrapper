@@ -21,7 +21,7 @@ var _runner = function(event, callback) {
     try {
         lambdaModule.handler(event, lambdacontext);
     } catch (ex) {
-        callback('Exception:' + ex.toString());
+        throw(ex);
     }
 };
 
