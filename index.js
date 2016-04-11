@@ -1,10 +1,11 @@
-// Pseudowrapper for AWS Lambda
-var lambdaModule;
 
-var _runner = function(event, callback) {
-    if (!lambdaModule) {
-        return callback('Module not initialized', null);
-    }
+
+// Wrapper class for AWS Lambda
+
+function Wrapped(mod) {
+    this.lambdaModule = mod;
+}
+Wrapped.prototype.run = function(event, callback) {
 
     var lambdacontext = {
         succeed: function(success) {
@@ -19,16 +20,39 @@ var _runner = function(event, callback) {
     };
 
     try {
-        lambdaModule.handler(event, lambdacontext);
+        this.lambdaModule.handler(event, lambdacontext);
     } catch (ex) {
         throw(ex);
     }
 };
 
+// Wrapper factory
+
+function wrap(mod) {
+    var wrapped = new Wrapped(mod);
+    return wrapped;
+}
+
+// Static variables (for backwards compatibility)
+
+var latest;
+
 // Public interface for the module
+
 module.exports = exports = {
+
+    // reusable wrap method
+    wrap: wrap,
+
+    // static init/run interface for backwards compatibility
     init: function(mod) {
-        lambdaModule = mod;
+        latest = wrap(mod);
     },
-    run: _runner
+    run: function(event, callback) {
+        if (typeof latest === typeof undefined) {
+            return callback('Module not initialized', null);
+        } else {
+            latest.run(event, callback);
+        }
+    }
 };
