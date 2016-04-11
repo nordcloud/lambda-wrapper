@@ -20,5 +20,9 @@
   "bugs": {
     "url": "https://github.com/SC5/lambda-local/issues"
   },
-  "homepage": "https://github.com/SC5/lambda-local"
+  "homepage": "https://github.com/SC5/lambda-local",
+  "devDependencies": {
+    "chai": "^3.5.0",
+    "mocha": "^2.4.5"
+  }
 }
