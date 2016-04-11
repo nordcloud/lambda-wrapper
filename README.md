@@ -7,7 +7,7 @@ Wrapper for running lambda modules locally during development
 
     // Loads the module in myModule/mymod.js
     var lambdaFunc = require('myModule/mymod.js');
-    var lambda = require('lambda-wrapper').init(lambdaFunc); 
+    var lambda = require('lambda-wrapper').wrap(lambdaFunc);
 
 ### Running the function in the Lambda module
 
@@ -21,8 +21,8 @@ Wrapper for running lambda modules locally during development
 
 ## Release History
 
-* 2015/09/01 - v0.0.2 - Pass module object rather than path to init(). 
-                        Removed automatic loading of module. 
+* 2015/09/01 - v0.0.2 - Pass module object rather than path to init().
+                        Removed automatic loading of module.
 * 2015/07/23 - v0.0.1 - Initial version of module
 
 ## License
