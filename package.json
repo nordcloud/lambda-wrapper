@@ -1,6 +1,6 @@
 {
   "name": "lambda-wrapper",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "description": "Wrapper for running Amazon Lambda modules locally",
   "main": "index.js",
   "scripts": {
@@ -8,7 +8,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/SC5/lambda-local.git"
+    "url": "https://github.com/SC5/lambda-wrapper.git"
   },
   "keywords": [
     "AWS",
@@ -16,13 +16,16 @@
     "local"
   ],
   "author": "Mikael Puittinen (mikael.puittinen@sc5.io)",
+  "contributors": [
+    "Toni Ruottu (https://sc5.io)"
+  ],
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/SC5/lambda-local/issues"
+    "url": "https://github.com/SC5/lambda-wrapper/issues"
   },
-  "homepage": "https://github.com/SC5/lambda-local",
+  "homepage": "https://github.com/SC5/lambda-wrapper",
   "devDependencies": {
-    "chai": "^3.5.0",
-    "mocha": "^2.4.5"
+    "chai": "3.5.0",
+    "mocha": "2.4.5"
   }
 }
