@@ -33,4 +33,20 @@ describe('lambda-wrapper', function() {
       done();
     });
   });
+  
+  it('wrap + run module 2', function(done) {
+    var w2 = wrapper.wrap(testMod2);
+    w2.run({foo: 'bar'}, function(err, response) {
+       expect(response.foo).to.be.equal('bar');
+       done();    
+    });    
+  });
+  
+  it('wrap + run module 1', function(done) {
+    var w1 = wrapper.wrap(testMod1);
+    w1.run({test: 'success'}, function(err, response) {
+       expect(response).to.be.equal('Success');
+       done();    
+    });    
+  });
 });
