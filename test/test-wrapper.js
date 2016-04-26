@@ -1,19 +1,25 @@
 var testMod1 = {
-    handler: function(event, context) {
-        if (event.test === 'success') {
-            context.succeed('Success');
-        } 
-        if (event.test === 'fail') {
-            context.fail('Fail');
-        }
+  handler: function(event, context) {
+    if (event.test === 'success') {
+      context.succeed('Success');
+    } 
+    if (event.test === 'fail') {
+      context.fail('Fail');
     }
+  }
 };
 
 var testMod2 = {
-    handler: function(event, context) {
-        context.succeed(event);        
-    }
+  handler: function(event, context) {
+    context.succeed(event);        
+  }
 };
+
+var testMod3 = {
+  handler: function(event, context, callback) {
+    callback(null, event);
+  }
+}
 
 var wrapper = require('../index.js');
 var expect = require('chai').expect;
@@ -46,6 +52,14 @@ describe('lambda-wrapper', function() {
     var w1 = wrapper.wrap(testMod1);
     w1.run({test: 'success'}, function(err, response) {
        expect(response).to.be.equal('Success');
+       done();    
+    });    
+  });
+  
+  it('wrap + run module 3 (callback notation)', function(done) {
+    var w1 = wrapper.wrap(testMod3);
+    w1.run({test: 'cbsuccess'}, function(err, response) {
+       expect(response.test).to.be.equal('cbsuccess');
        done();    
     });    
   });

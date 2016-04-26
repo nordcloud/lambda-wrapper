@@ -20,7 +20,7 @@ Wrapped.prototype.run = function(event, callback) {
     };
 
     try {
-        this.lambdaModule.handler(event, lambdacontext);
+        this.lambdaModule.handler(event, lambdacontext, callback);
     } catch (ex) {
         throw(ex);
     }
