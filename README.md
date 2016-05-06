@@ -21,6 +21,7 @@ Wrapper for running lambda modules locally during development
 
 ## Release History
 
+* 2016/04/26 - v0.0.6 - Support for NodeJS 4.3 runtime (and callback notation)
 * 2015/09/01 - v0.0.2 - Pass module object rather than path to init().
                         Removed automatic loading of module.
 * 2015/07/23 - v0.0.1 - Initial version of module
