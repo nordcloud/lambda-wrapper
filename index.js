@@ -5,8 +5,8 @@
 function Wrapped(mod) {
     this.lambdaModule = mod;
 }
-Wrapped.prototype.run = function(event, callback) {
 
+Wrapped.prototype.run = function(event, callback) {
     var lambdacontext = {
         succeed: function(success) {
             return callback(null, success);
@@ -20,7 +20,30 @@ Wrapped.prototype.run = function(event, callback) {
     };
 
     try {
-        this.lambdaModule.handler(event, lambdacontext, callback);
+        if (this.lambdaModule.handler) {
+            this.lambdaModule.handler(event, lambdacontext, callback);
+        } else {
+            var AWS = require('aws-sdk');
+            if (this.lambdaModule.region) {
+                AWS.config.update({
+                    region: this.lambdaModule.region
+                });
+            }
+            var lambda = new AWS.Lambda();
+            var params = {
+                FunctionName: this.lambdaModule.lambdaFunction,
+                InvocationType: 'RequestResponse',
+                LogType: 'None',
+                Payload: JSON.stringify(event),
+            }; 
+            lambda.invoke(params, function(err, data) {
+                if (err) {
+                    return callback(err);
+                }
+
+                callback(null, JSON.parse(data.Payload));
+            });
+        }
     } catch (ex) {
         throw(ex);
     }
@@ -30,6 +53,7 @@ Wrapped.prototype.run = function(event, callback) {
 
 function wrap(mod) {
     var wrapped = new Wrapped(mod);
+
     return wrapped;
 }
 

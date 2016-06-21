@@ -63,4 +63,20 @@ describe('lambda-wrapper', function() {
        done();    
     });    
   });
+
+  it('can call lambda functions deployed in AWS', function(done) {
+    var wLive = wrapper.wrap({
+      lambdaFunction: 'lambdaWrapper-test',
+      region: process.env.AWS_DEFAULT_REGION || 'eu-central-1'
+    });
+    wLive.run({test: 'livesuccess'}, function(err, response) {
+       if (err) {
+         return done(err);
+       }
+       
+       expect(response.src).to.be.equal('lambda');
+       expect(response.event.test).to.be.equal('livesuccess');
+       done();    
+    });    
+  });
 });

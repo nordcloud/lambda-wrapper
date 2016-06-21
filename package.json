@@ -1,6 +1,6 @@
 {
   "name": "lambda-wrapper",
-  "version": "0.0.6",
+  "version": "0.1.0",
   "description": "Wrapper for running Amazon Lambda modules locally",
   "main": "index.js",
   "scripts": {
@@ -25,6 +25,7 @@
   },
   "homepage": "https://github.com/SC5/lambda-wrapper",
   "devDependencies": {
+    "aws-sdk": "^2.4.0",
     "chai": "3.5.0",
     "mocha": "2.4.5"
   }
