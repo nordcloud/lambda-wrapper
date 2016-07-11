@@ -2,7 +2,7 @@ var testMod1 = {
   handler: function(event, context) {
     if (event.test === 'success') {
       context.succeed('Success');
-    } 
+    }
     if (event.test === 'fail') {
       context.fail('Fail');
     }
@@ -11,12 +11,18 @@ var testMod1 = {
 
 var testMod2 = {
   handler: function(event, context) {
-    context.succeed(event);        
+    context.succeed(event);
   }
 };
 
 var testMod3 = {
   handler: function(event, context, callback) {
+    callback(null, event);
+  }
+}
+
+var testMod4 = {
+  customHandlerName: function(event, context, callback) {
     callback(null, event);
   }
 }
@@ -39,29 +45,37 @@ describe('lambda-wrapper', function() {
       done();
     });
   });
-  
+
   it('wrap + run module 2', function(done) {
     var w2 = wrapper.wrap(testMod2);
     w2.run({foo: 'bar'}, function(err, response) {
        expect(response.foo).to.be.equal('bar');
-       done();    
-    });    
+       done();
+    });
   });
-  
+
   it('wrap + run module 1', function(done) {
     var w1 = wrapper.wrap(testMod1);
     w1.run({test: 'success'}, function(err, response) {
        expect(response).to.be.equal('Success');
-       done();    
-    });    
+       done();
+    });
   });
-  
+
   it('wrap + run module 3 (callback notation)', function(done) {
     var w1 = wrapper.wrap(testMod3);
     w1.run({test: 'cbsuccess'}, function(err, response) {
        expect(response.test).to.be.equal('cbsuccess');
-       done();    
-    });    
+       done();
+    });
+  });
+
+  it('wrap + run module 4 (custom handler name)', function(done) {
+    var w1 = wrapper.wrap(testMod4, 'customHandlerName');
+    w1.run({test: 'cbsuccess'}, function(err, response) {
+       expect(response.test).to.be.equal('cbsuccess');
+       done();
+    });
   });
 
   it('can call lambda functions deployed in AWS', function(done) {
@@ -73,10 +87,10 @@ describe('lambda-wrapper', function() {
        if (err) {
          return done(err);
        }
-       
+
        expect(response.src).to.be.equal('lambda');
        expect(response.event.test).to.be.equal('livesuccess');
-       done();    
-    });    
+       done();
+    });
   });
 });
