@@ -6,8 +6,8 @@ function Wrapped(mod) {
     this.lambdaModule = mod;
 }
 
-Wrapped.prototype.run = function(event, callback) {
-    var lambdacontext = {
+Wrapped.prototype.run = function(event, callback, customContext) {
+    var lambdacontext = Object.assign(customContext || {}, {
         succeed: function(success) {
             return callback(null, success);
         },
@@ -17,7 +17,7 @@ Wrapped.prototype.run = function(event, callback) {
         done: function(error, success) {
             return callback(error, success);
         }
-    };
+    });
 
     try {
         if (this.lambdaModule.handler) {
