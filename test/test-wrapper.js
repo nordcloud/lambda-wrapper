@@ -21,6 +21,12 @@ var testMod3 = {
   }
 }
 
+var testMod4 = {
+  myHandler: function(event,context,callback) {
+    callback(null, event);
+  }
+}
+
 var wrapper = require('../index.js');
 var expect = require('chai').expect;
 
@@ -59,6 +65,16 @@ describe('lambda-wrapper', function() {
   it('wrap + run module 3 (callback notation)', function(done) {
     var w1 = wrapper.wrap(testMod3);
     w1.run({test: 'cbsuccess'}, function(err, response) {
+       expect(response.test).to.be.equal('cbsuccess');
+       done();    
+    });    
+  });
+
+  it('wrap + run module 4 (alternate handler)', function(done) {
+    var w4 = wrapper.wrap(testMod4, {
+      handler: 'myHandler'
+    });
+    w4.run({test: 'cbsuccess'}, function(err, response) {
        expect(response.test).to.be.equal('cbsuccess');
        done();    
     });    

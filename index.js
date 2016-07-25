@@ -2,8 +2,17 @@
 
 // Wrapper class for AWS Lambda
 
-function Wrapped(mod) {
+function Wrapped(mod, options) {
+    if (options == null) {
+        options = {};
+    }
+
     this.lambdaModule = mod;
+    var handler = options.handler || 'handler';
+
+    if (mod[handler]) {
+        this.handler =mod[handler];
+    }
 }
 
 Wrapped.prototype.run = function(event, callback) {
@@ -20,8 +29,8 @@ Wrapped.prototype.run = function(event, callback) {
     };
 
     try {
-        if (this.lambdaModule.handler) {
-            this.lambdaModule.handler(event, lambdacontext, callback);
+        if (this.handler) {
+            this.handler(event, lambdacontext, callback);
         } else {
             var AWS = require('aws-sdk');
             if (this.lambdaModule.region) {
@@ -51,8 +60,8 @@ Wrapped.prototype.run = function(event, callback) {
 
 // Wrapper factory
 
-function wrap(mod) {
-    var wrapped = new Wrapped(mod);
+function wrap(mod, options) {
+    var wrapped = new Wrapped(mod, options);
 
     return wrapped;
 }
@@ -69,8 +78,8 @@ module.exports = exports = {
     wrap: wrap,
 
     // static init/run interface for backwards compatibility
-    init: function(mod) {
-        latest = wrap(mod);
+    init: function(mod, options) {
+        latest = wrap(mod, options);
     },
     run: function(event, callback) {
         if (typeof latest === typeof undefined) {
