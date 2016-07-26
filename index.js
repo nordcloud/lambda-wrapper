@@ -1,7 +1,6 @@
 
 
 // Wrapper class for AWS Lambda
-
 function Wrapped(mod, options) {
     if (options == null) {
         options = {};
@@ -15,8 +14,10 @@ function Wrapped(mod, options) {
     }
 }
 
-Wrapped.prototype.run = function(event, callback, customContext) {
-    var lambdacontext = Object.assign(customContext || {}, {
+Wrapped.prototype.runHandler = function(event, customContext, callback) {
+    var callback;
+
+    var defaultContext = {
         succeed: function(success) {
             return callback(null, success);
         },
@@ -26,11 +27,23 @@ Wrapped.prototype.run = function(event, callback, customContext) {
         done: function(error, success) {
             return callback(error, success);
         }
-    });
+    };
+
+    var lambdaContext = customContext;
+
+    if (!lambdaContext.succeed) {
+        lambdaContext.succeed = defaultContext.succeed;
+    }
+    if (!lambdaContext.fail) {
+        lambdaContext.fail = defaultContext.fail;
+    }   
+    if (!lambdaContext.done) {
+        lambdaContext.done = defaultContext.done;
+    }
 
     try {
         if (this.handler) {
-            this.handler(event, lambdacontext, callback);
+            this.handler(event, lambdaContext, callback);
         } else {
             var AWS = require('aws-sdk');
             if (this.lambdaModule.region) {
@@ -56,6 +69,10 @@ Wrapped.prototype.run = function(event, callback, customContext) {
     } catch (ex) {
         throw(ex);
     }
+}
+
+Wrapped.prototype.run = function(event, callback) {
+   return this.runHandler(event,{},callback);
 };
 
 // Wrapper factory

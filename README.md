@@ -26,17 +26,24 @@ Wrapper for running lambda modules locally or from AWS during development
         ... process data returned by the Lambda function
     })
 
+If you want to pass a custom context to the Lambda module (only when running local), use the runHandler method. e.g.
+    
+    lambda.runHandler(event, customContext, callback)
+
+Documentation for valid propreties in the Lambda context object are documented here http://docs.aws.amazon.com/lambda/latest/dg/nodejs-prog-model-context.html
+ 
 ## Development
 
-Run module tests using 
+Please run module tests in a Node 4 environment prior to submitting PRs using 
 
     npm run test
 
 Live lambda run test requires that the function in lambdaWrapper-test.js is deployed 
-to your AWS account as 'lambdaWrapper-test'.
+to your AWS account as 'lambdaWrapper-test'. 
 
 ## Release History
 
+* 2016/07/26 - v0.1.1 - Support for alternative handler. runHandler method for passing custom context.
 * 2016/04/26 - v0.1.0 - Support for running lambda functions also from AWS
 * 2016/04/26 - v0.0.6 - Support for NodeJS 4.3 runtime (and callback notation)
 * 2015/09/01 - v0.0.2 - Pass module object rather than path to init().

@@ -27,6 +27,14 @@ var testMod4 = {
   }
 }
 
+var testMod5 = {
+  handler: function(event,context,callback) {
+    callback(null, {
+      test: context.functionName
+    });
+  }
+}
+
 var wrapper = require('../index.js');
 var expect = require('chai').expect;
 
@@ -76,6 +84,14 @@ describe('lambda-wrapper', function() {
     });
     w4.run({test: 'cbsuccess'}, function(err, response) {
        expect(response.test).to.be.equal('cbsuccess');
+       done();    
+    });    
+  });
+  it('wrap + runHandler module 5 (custom context)', function(done) {
+    var w5 = wrapper.wrap(testMod5);
+
+    w5.runHandler({test: 'cbsuccess'}, {functionName: 'testing'}, function(err, response) {
+       expect(response.test).to.be.equal('testing');
        done();    
     });    
   });
