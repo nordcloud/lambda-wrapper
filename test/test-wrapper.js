@@ -79,7 +79,7 @@ describe('lambda-wrapper', () => {
     });
   });
 
-  it('wrap + run module 2', (done) => {
+  it('wrap + run module 2 - callback', (done) => {
     const w = wrapper.wrap(testMod2);
 
     w.run({foo: 'bar'}, (err, response) => {
@@ -88,7 +88,18 @@ describe('lambda-wrapper', () => {
     });
   });
 
-  it('wrap + run module 1', (done) => {
+  it('wrap + run module 2 - promise', (done) => {
+    const w = wrapper.wrap(testMod2);
+
+    w.run({foo: 'bar'})
+      .then((response) => {
+        expect(response.foo).to.be.equal('bar');
+        done();
+      })
+      .catch(done);
+  });
+
+  it('wrap + run module 1 - callback', (done) => {
     const w = wrapper.wrap(testMod1);
 
     w.run({test: 'success'}, (err, response) => {
@@ -97,7 +108,18 @@ describe('lambda-wrapper', () => {
     });
   });
 
-  it('wrap + run module 3 (callback notation)', (done) => {
+  it('wrap + run module 1 - promise', (done) => {
+    const w = wrapper.wrap(testMod1);
+
+    w.run({test: 'success'})
+      .then((response) => {
+        expect(response).to.be.equal('Success');
+        done();
+      })
+      .catch(done);
+  });
+
+  it('wrap + run module 3 (callback notation) - callback', (done) => {
     const w = wrapper.wrap(testMod3);
 
     w.run({test: 'cbsuccess'}, (err, response) => {
@@ -106,31 +128,68 @@ describe('lambda-wrapper', () => {
     });
   });
 
-  it('wrap + run module 4 (alternate handler)', (done) => {
+  it('wrap + run module 3 (callback notation) - promise', (done) => {
+    const w = wrapper.wrap(testMod3);
+
+    w.run({test: 'cbsuccess'})
+      .then((response) => {
+        expect(response.test).to.be.equal('cbsuccess');
+        done();
+      })
+      .catch(done);
+  });
+
+  it('wrap + run module 4 (alternate handler) - callback', (done) => {
     const w = wrapper.wrap(testMod4, {
       handler: 'myHandler'
     });
+
     w.run({test: 'cbsuccess'}, (err, response) => {
       expect(response.test).to.be.equal('cbsuccess');
       done();
     });
   });
-  it('wrap + runHandler module 5 (custom context)', (done) => {
+
+  it('wrap + run module 4 (alternate handler) - promise', (done) => {
+    const w = wrapper.wrap(testMod4, {
+      handler: 'myHandler'
+    });
+
+    w.run({test: 'cbsuccess'})
+      .then((response) => {
+        expect(response.test).to.be.equal('cbsuccess');
+        done();
+      })
+      .catch(done);
+  });
+
+  it('wrap + runHandler module 5 (custom context) - callback', (done) => {
     const w = wrapper.wrap(testMod5);
 
-    w.runHandler({test: 'cbsuccess'}, {functionName: 'testing'}, (err, response) => {
+    w.runHandler({ test: 'cbsuccess' }, { functionName: 'testing' }, (err, response) => {
       expect(response.test).to.be.equal('testing');
       done();
     });
   });
 
-  it('can call lambda functions deployed in AWS', (done) => {
+  it('wrap + runHandler module 5 (custom context) - promise', (done) => {
+    const w = wrapper.wrap(testMod5);
+
+    w.runHandler({ test: 'cbsuccess' }, { functionName: 'testing' })
+      .then((response) => {
+        expect(response.test).to.be.equal('testing');
+        done();
+      })
+      .catch(done);
+  });
+
+  it('can call lambda functions deployed in AWS - callback', (done) => {
     const w = wrapper.wrap({
       lambdaFunction: 'lambdaWrapper-test',
       region: process.env.AWS_DEFAULT_REGION || 'eu-central-1'
     });
 
-    w.run({test: 'livesuccess'}, (err, response) => {
+    w.run({ test: 'livesuccess' }, (err, response) => {
       if (err) {
         return done(err);
       }
@@ -139,5 +198,19 @@ describe('lambda-wrapper', () => {
       expect(response.event.test).to.be.equal('livesuccess');
       done();
     });
+  });
+
+  it('can call lambda functions deployed in AWS - promise', (done) => {
+    const w = wrapper.wrap({
+      lambdaFunction: 'lambdaWrapper-test',
+      region: process.env.AWS_DEFAULT_REGION || 'eu-central-1'
+    });
+
+    w.run({ test: 'livesuccess' })
+      .then((response) => {
+        expect(response.src).to.be.equal('lambda');
+        expect(response.event.test).to.be.equal('livesuccess');
+        done();
+      }).catch(done);
   });
 });

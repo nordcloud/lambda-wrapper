@@ -16,45 +16,56 @@ class Wrapped {
     }
   }
 
-  runHandler(event, customContext, callback) {
+  runHandler(event, customContext, cb) {
+    return new Promise((resolve, reject) => {
 
-    const defaultContext = {
-      succeed: success => callback(null, success),
-      fail: error => callback(error, null),
-      done: (error, success) => callback(error, success)
-    };
-
-    const lambdaContext = Object.assign({}, defaultContext, customContext);
-
-    try {
-      if (this.handler) {
-        this.handler(event, lambdaContext, callback);
-      } else {
-        if (this.lambdaModule.region) {
-          AWS.config.update({
-            region: this.lambdaModule.region
-          });
+      const promiseCallback = (error, response) => {
+        if(error) {
+          return reject(error);
         }
+        return resolve(response);
+      };
 
-        const lambda = new AWS.Lambda();
-        const params = {
-          FunctionName: this.lambdaModule.lambdaFunction,
-          InvocationType: 'RequestResponse',
-          LogType: 'None',
-          Payload: JSON.stringify(event)
-        };
+      const callback = cb || promiseCallback;
 
-        lambda.invoke(params, (err, data) => {
-          if (err) {
-            return callback(err);
+      const defaultContext = {
+        succeed: success => callback(null, success),
+        fail: error => callback(error, null),
+        done: (error, success) => callback(error, success)
+      };
+
+      const lambdaContext = Object.assign({}, defaultContext, customContext);
+
+      try {
+        if (this.handler) {
+          this.handler(event, lambdaContext, callback);
+        } else {
+          if (this.lambdaModule.region) {
+            AWS.config.update({
+              region: this.lambdaModule.region
+            });
           }
 
-          return callback(null, JSON.parse(data.Payload));
-        });
+          const lambda = new AWS.Lambda();
+          const params = {
+            FunctionName: this.lambdaModule.lambdaFunction,
+            InvocationType: 'RequestResponse',
+            LogType: 'None',
+            Payload: JSON.stringify(event)
+          };
+
+          lambda.invoke(params, (err, data) => {
+            if (err) {
+              return callback(err);
+            }
+
+            return callback(null, JSON.parse(data.Payload));
+          });
+        }
+      } catch (ex) {
+        throw (ex);
       }
-    } catch (ex) {
-      throw (ex);
-    }
+    });
   }
 
   run(event, callback) {
