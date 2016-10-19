@@ -1,62 +1,66 @@
 'use strict';
 
 const AWS = require('aws-sdk');
+const Promise = require('bluebird');
 
 // Wrapper class for AWS Lambda
-function Wrapped(mod, opts) {
-  const options = opts || {};
+class Wrapped {
+  constructor(mod, opts) {
+    const options = opts || {};
 
-  this.lambdaModule = mod;
-  const handler = options.handler || 'handler';
+    this.lambdaModule = mod;
+    const handler = options.handler || 'handler';
 
-  if (mod[handler]) {
-    this.handler = mod[handler];
+    if (mod[handler]) {
+      this.handler = mod[handler];
+    }
   }
-}
 
-Wrapped.prototype.runHandler = (event, customContext, callback) => {
+  runHandler(event, customContext, callback) {
 
-  const defaultContext = {
-    succeed: success => callback(null, success),
-    fail: error => callback(error, null),
-    done: (error, success) => callback(error, success)
-  };
+    const defaultContext = {
+      succeed: success => callback(null, success),
+      fail: error => callback(error, null),
+      done: (error, success) => callback(error, success)
+    };
 
-  const lambdaContext = Object.assign({}, defaultContext, customContext);
+    const lambdaContext = Object.assign({}, defaultContext, customContext);
 
-  try {
-    if (this.handler) {
-      this.handler(event, lambdaContext, callback);
-    } else {
-      if (this.lambdaModule.region) {
-        AWS.config.update({
-          region: this.lambdaModule.region
-        });
-      }
-
-      const lambda = new AWS.Lambda();
-      const params = {
-        FunctionName: this.lambdaModule.lambdaFunction,
-        InvocationType: 'RequestResponse',
-        LogType: 'None',
-        Payload: JSON.stringify(event)
-      };
-
-      lambda.invoke(params, (err, data) => {
-        if (err) {
-          return callback(err);
+    try {
+      if (this.handler) {
+        this.handler(event, lambdaContext, callback);
+      } else {
+        if (this.lambdaModule.region) {
+          AWS.config.update({
+            region: this.lambdaModule.region
+          });
         }
 
-        return callback(null, JSON.parse(data.Payload));
-      });
+        const lambda = new AWS.Lambda();
+        const params = {
+          FunctionName: this.lambdaModule.lambdaFunction,
+          InvocationType: 'RequestResponse',
+          LogType: 'None',
+          Payload: JSON.stringify(event)
+        };
+
+        lambda.invoke(params, (err, data) => {
+          if (err) {
+            return callback(err);
+          }
+
+          return callback(null, JSON.parse(data.Payload));
+        });
+      }
+    } catch (ex) {
+      throw (ex);
     }
-  } catch (ex) {
-    throw (ex);
+  }
+
+  run(event, callback) {
+    return this.runHandler(event, {}, callback);
   }
 }
-
-Wrapped.prototype.run =
-  (event, callback) => this.runHandler(event, {}, callback);
 
 // Wrapper factory
 
@@ -77,10 +81,20 @@ module.exports = exports = {
   init: (mod, options) => {
     latest = wrap(mod, options);
   },
-  run: (event, callback) => {
+  run: (event, callback) => new Promise((resolve, reject) => {
     if (typeof latest === typeof undefined) {
-      return callback('Module not initialized', null);
+      const error = 'Module not initialized';
+      reject(error);
+      return callback(error, null);
     }
-    return latest.run(event, callback);
-  }
+    return latest.run(event, (err, data) => {
+      if (callback) {
+        return callback(err, data);
+      }
+      if (err) {
+        return reject(err);
+      }
+      return resolve(data);
+    });
+  })
 };

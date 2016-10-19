@@ -1,114 +1,143 @@
-var testMod1 = {
-  handler: function(event, context) {
+'use strict';
+
+const wrapper = require('../index.js');
+const expect = require('chai').expect;
+
+const testMod1 = {
+  handler: (event, context) => {
     if (event.test === 'success') {
       context.succeed('Success');
-    } 
+    }
     if (event.test === 'fail') {
       context.fail('Fail');
     }
   }
 };
 
-var testMod2 = {
-  handler: function(event, context) {
-    context.succeed(event);        
+const testMod2 = {
+  handler: (event, context) => {
+    context.succeed(event);
   }
 };
 
-var testMod3 = {
-  handler: function(event, context, callback) {
+const testMod3 = {
+  handler: (event, context, callback) => {
     callback(null, event);
   }
-}
+};
 
-var testMod4 = {
-  myHandler: function(event,context,callback) {
+const testMod4 = {
+  myHandler: (event, context, callback) => {
     callback(null, event);
   }
-}
+};
 
-var testMod5 = {
-  handler: function(event,context,callback) {
+const testMod5 = {
+  handler: (event, context, callback) => {
     callback(null, {
       test: context.functionName
     });
   }
-}
+};
 
-var wrapper = require('../index.js');
-var expect = require('chai').expect;
-
-describe('lambda-wrapper', function() {
-  it('init + run with success', function(done) {
+describe('lambda-wrapper', () => {
+  it('init + run with success - callback', (done) => {
     wrapper.init(testMod1);
-    wrapper.run({test: 'success'}, function(err, response) {
+
+    wrapper.run({test: 'success'}, (err, response) => {
       expect(response).to.be.equal('Success');
       done();
     });
   });
-  it('init + run with failure', function(done) {
+
+  it('init + run with success - promise', (done) => {
     wrapper.init(testMod1);
-    wrapper.run({test: 'fail'}, function(err, response) {
+
+    wrapper.run({test: 'success'})
+      .then((response) => {
+        expect(response).to.be.equal('Success');
+        done();
+      })
+      .catch(done);
+  });
+
+  it('init + run with failure - callback', (done) => {
+    wrapper.init(testMod1);
+
+    wrapper.run({test: 'fail'}, (err, response) => {
       expect(err).to.be.equal('Fail');
       done();
     });
   });
-  
-  it('wrap + run module 2', function(done) {
-    var w2 = wrapper.wrap(testMod2);
-    w2.run({foo: 'bar'}, function(err, response) {
-       expect(response.foo).to.be.equal('bar');
-       done();    
-    });    
-  });
-  
-  it('wrap + run module 1', function(done) {
-    var w1 = wrapper.wrap(testMod1);
-    w1.run({test: 'success'}, function(err, response) {
-       expect(response).to.be.equal('Success');
-       done();    
-    });    
-  });
-  
-  it('wrap + run module 3 (callback notation)', function(done) {
-    var w1 = wrapper.wrap(testMod3);
-    w1.run({test: 'cbsuccess'}, function(err, response) {
-       expect(response.test).to.be.equal('cbsuccess');
-       done();    
-    });    
+
+  it('init + run with failure - promise', (done) => {
+    wrapper.init(testMod1);
+
+    wrapper.run({test: 'fail'}).catch((err) => {
+      expect(err).to.be.equal('Fail');
+      done();
+    });
   });
 
-  it('wrap + run module 4 (alternate handler)', function(done) {
-    var w4 = wrapper.wrap(testMod4, {
+  it('wrap + run module 2', (done) => {
+    const w = wrapper.wrap(testMod2);
+
+    w.run({foo: 'bar'}, (err, response) => {
+      expect(response.foo).to.be.equal('bar');
+      done();
+    });
+  });
+
+  it('wrap + run module 1', (done) => {
+    const w = wrapper.wrap(testMod1);
+
+    w.run({test: 'success'}, (err, response) => {
+      expect(response).to.be.equal('Success');
+      done();
+    });
+  });
+
+  it('wrap + run module 3 (callback notation)', (done) => {
+    const w = wrapper.wrap(testMod3);
+
+    w.run({test: 'cbsuccess'}, (err, response) => {
+      expect(response.test).to.be.equal('cbsuccess');
+      done();
+    });
+  });
+
+  it('wrap + run module 4 (alternate handler)', (done) => {
+    const w = wrapper.wrap(testMod4, {
       handler: 'myHandler'
     });
-    w4.run({test: 'cbsuccess'}, function(err, response) {
-       expect(response.test).to.be.equal('cbsuccess');
-       done();    
-    });    
+    w.run({test: 'cbsuccess'}, (err, response) => {
+      expect(response.test).to.be.equal('cbsuccess');
+      done();
+    });
   });
-  it('wrap + runHandler module 5 (custom context)', function(done) {
-    var w5 = wrapper.wrap(testMod5);
+  it('wrap + runHandler module 5 (custom context)', (done) => {
+    const w = wrapper.wrap(testMod5);
 
-    w5.runHandler({test: 'cbsuccess'}, {functionName: 'testing'}, function(err, response) {
-       expect(response.test).to.be.equal('testing');
-       done();    
-    });    
+    w.runHandler({test: 'cbsuccess'}, {functionName: 'testing'}, (err, response) => {
+      expect(response.test).to.be.equal('testing');
+      done();
+    });
   });
 
-  it('can call lambda functions deployed in AWS', function(done) {
-    var wLive = wrapper.wrap({
+  it('can call lambda functions deployed in AWS', (done) => {
+    const w = wrapper.wrap({
       lambdaFunction: 'lambdaWrapper-test',
       region: process.env.AWS_DEFAULT_REGION || 'eu-central-1'
     });
-    wLive.run({test: 'livesuccess'}, function(err, response) {
-       if (err) {
-         return done(err);
-       }
-       
-       expect(response.src).to.be.equal('lambda');
-       expect(response.event.test).to.be.equal('livesuccess');
-       done();    
-    });    
+
+    w.run({test: 'livesuccess'}, (err, response) => {
+      if (err) {
+        return done(err);
+      }
+
+      expect(response.src).to.be.equal('lambda');
+      expect(response.event.test).to.be.equal('livesuccess');
+      done();
+    });
   });
 });
