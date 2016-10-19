@@ -1,108 +1,86 @@
+'use strict';
 
+const AWS = require('aws-sdk');
 
 // Wrapper class for AWS Lambda
-function Wrapped(mod, options) {
-    if (options == null) {
-        options = {};
-    }
+function Wrapped(mod, opts) {
+  const options = opts || {};
 
-    this.lambdaModule = mod;
-    var handler = options.handler || 'handler';
+  this.lambdaModule = mod;
+  const handler = options.handler || 'handler';
 
-    if (mod[handler]) {
-        this.handler =mod[handler];
-    }
+  if (mod[handler]) {
+    this.handler = mod[handler];
+  }
 }
 
-Wrapped.prototype.runHandler = function(event, customContext, callback) {
-    var callback;
+Wrapped.prototype.runHandler = (event, customContext, callback) => {
 
-    var defaultContext = {
-        succeed: function(success) {
-            return callback(null, success);
-        },
-        fail: function(error) {
-            return callback(error, null);
-        },
-        done: function(error, success) {
-            return callback(error, success);
+  const defaultContext = {
+    succeed: success => callback(null, success),
+    fail: error => callback(error, null),
+    done: (error, success) => callback(error, success)
+  };
+
+  const lambdaContext = Object.assign({}, defaultContext, customContext);
+
+  try {
+    if (this.handler) {
+      this.handler(event, lambdaContext, callback);
+    } else {
+      if (this.lambdaModule.region) {
+        AWS.config.update({
+          region: this.lambdaModule.region
+        });
+      }
+
+      const lambda = new AWS.Lambda();
+      const params = {
+        FunctionName: this.lambdaModule.lambdaFunction,
+        InvocationType: 'RequestResponse',
+        LogType: 'None',
+        Payload: JSON.stringify(event)
+      };
+
+      lambda.invoke(params, (err, data) => {
+        if (err) {
+          return callback(err);
         }
-    };
 
-    var lambdaContext = customContext;
-
-    if (!lambdaContext.succeed) {
-        lambdaContext.succeed = defaultContext.succeed;
+        return callback(null, JSON.parse(data.Payload));
+      });
     }
-    if (!lambdaContext.fail) {
-        lambdaContext.fail = defaultContext.fail;
-    }   
-    if (!lambdaContext.done) {
-        lambdaContext.done = defaultContext.done;
-    }
-
-    try {
-        if (this.handler) {
-            this.handler(event, lambdaContext, callback);
-        } else {
-            var AWS = require('aws-sdk');
-            if (this.lambdaModule.region) {
-                AWS.config.update({
-                    region: this.lambdaModule.region
-                });
-            }
-            var lambda = new AWS.Lambda();
-            var params = {
-                FunctionName: this.lambdaModule.lambdaFunction,
-                InvocationType: 'RequestResponse',
-                LogType: 'None',
-                Payload: JSON.stringify(event),
-            }; 
-            lambda.invoke(params, function(err, data) {
-                if (err) {
-                    return callback(err);
-                }
-
-                callback(null, JSON.parse(data.Payload));
-            });
-        }
-    } catch (ex) {
-        throw(ex);
-    }
+  } catch (ex) {
+    throw (ex);
+  }
 }
 
-Wrapped.prototype.run = function(event, callback) {
-   return this.runHandler(event,{},callback);
-};
+Wrapped.prototype.run =
+  (event, callback) => this.runHandler(event, {}, callback);
 
 // Wrapper factory
 
-function wrap(mod, options) {
-    var wrapped = new Wrapped(mod, options);
-
-    return wrapped;
-}
+const wrap = (mod, options) => new Wrapped(mod, options);
 
 // Static variables (for backwards compatibility)
 
-var latest;
+let latest;
 
 // Public interface for the module
 
 module.exports = exports = {
 
-    // reusable wrap method
-    wrap: wrap,
+  // reusable wrap method
+  wrap,
 
-    // static init/run interface for backwards compatibility
-    init: function(mod, options) {
-        latest = wrap(mod, options);
-    },
-    run: function(event, callback) {
-        if (typeof latest === typeof undefined) {
-            return callback('Module not initialized', null);
-        } else {
-            latest.run(event, callback);
-        }
+  // static init/run interface for backwards compatibility
+  init: (mod, options) => {
+    latest = wrap(mod, options);
+  },
+  run: (event, callback) => {
+    if (typeof latest === typeof undefined) {
+      return callback('Module not initialized', null);
     }
+    return latest.run(event, callback);
+  }
 };
