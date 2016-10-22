@@ -54,7 +54,7 @@ to your AWS account as 'lambdaWrapper-test'.
 ## License
 
 Copyright (c) 2015 [SC5](http://sc5.io/), licensed for users and contributors under MIT license.
-https://github.com/SC5/aws-document-cache/blob/master/LICENSE
+https://github.com/SC5/lambda-wrapper/blob/master/LICENSE
 
 
-[![Bitdeli Badge](https://d2weczhvl823v0.cloudfront.net/SC5/lambda-local/trend.png)](https://bitdeli.com/free "Bitdeli Badge")
+[![Bitdeli Badge](https://d2weczhvl823v0.cloudfront.net/SC5/lambda-wrapper/trend.png)](https://bitdeli.com/free "Bitdeli Badge")
