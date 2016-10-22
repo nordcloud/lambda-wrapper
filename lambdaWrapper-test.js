@@ -3,9 +3,8 @@
 'use strict';
 
 exports.handler = (event, context, callback) => {
-
-    callback(null, {
-        src: 'lambda',
-        event: event
-    });  
+  callback(null, {
+    src: 'lambda',
+    event
+  });
 };
