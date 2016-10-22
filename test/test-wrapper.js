@@ -40,7 +40,7 @@ const testMod5 = {
   }
 };
 
-describe('lambda-wrapper', () => {
+describe('lambda-wrapper local', () => {
   it('init + run with success - callback', (done) => {
     wrapper.init(testMod1);
 
@@ -182,7 +182,9 @@ describe('lambda-wrapper', () => {
       })
       .catch(done);
   });
+});
 
+describe('lambda-wrapper live', () => {
   it('can call lambda functions deployed in AWS - callback', (done) => {
     const w = wrapper.wrap({
       lambdaFunction: 'lambdaWrapper-test',
