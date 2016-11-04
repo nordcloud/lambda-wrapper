@@ -1,4 +1,7 @@
 # lambda-wrapper
+
+[![Build Status](https://travis-ci.org/SC5/lambda-wrapper.svg?branch=master)](https://travis-ci.org/SC5/lambda-wrapper)
+
 Wrapper for running lambda modules locally or from AWS during development
 
 ## Use 
@@ -53,8 +56,5 @@ to your AWS account as 'lambdaWrapper-test'.
 
 ## License
 
-Copyright (c) 2015 [SC5](http://sc5.io/), licensed for users and contributors under MIT license.
+Copyright (c) 2016 [SC5](http://sc5.io/), licensed for users and contributors under MIT license.
 https://github.com/SC5/lambda-wrapper/blob/master/LICENSE
-
-
-[![Bitdeli Badge](https://d2weczhvl823v0.cloudfront.net/SC5/lambda-wrapper/trend.png)](https://bitdeli.com/free "Bitdeli Badge")
