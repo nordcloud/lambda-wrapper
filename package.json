@@ -4,7 +4,8 @@
   "description": "Wrapper for running Amazon Lambda modules locally",
   "main": "index.js",
   "scripts": {
-    "test": "mocha"
+    "test": "RUN_LIVE=true npm run unit-tests",
+    "unit-tests": "mocha"
   },
   "repository": {
     "type": "git",

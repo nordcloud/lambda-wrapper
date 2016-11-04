@@ -184,35 +184,37 @@ describe('lambda-wrapper local', () => {
   });
 });
 
-describe('lambda-wrapper live', () => {
-  it('can call lambda functions deployed in AWS - callback', (done) => {
-    const w = wrapper.wrap({
-      lambdaFunction: 'lambdaWrapper-test',
-      region: process.env.AWS_DEFAULT_REGION || 'eu-central-1'
-    });
+if (process.env.RUN_LIVE) {
+  describe('lambda-wrapper live', () => {
+    it('can call lambda functions deployed in AWS - callback', (done) => {
+      const w = wrapper.wrap({
+        lambdaFunction: 'lambdaWrapper-test',
+        region: process.env.AWS_DEFAULT_REGION || 'eu-central-1'
+      });
 
-    w.run({ test: 'livesuccess' }, (err, response) => {
-      if (err) {
-        return done(err);
-      }
+      w.run({ test: 'livesuccess' }, (err, response) => {
+        if (err) {
+          return done(err);
+        }
 
-      expect(response.src).to.be.equal('lambda');
-      expect(response.event.test).to.be.equal('livesuccess');
-      done();
-    });
-  });
-
-  it('can call lambda functions deployed in AWS - promise', (done) => {
-    const w = wrapper.wrap({
-      lambdaFunction: 'lambdaWrapper-test',
-      region: process.env.AWS_DEFAULT_REGION || 'eu-central-1'
-    });
-
-    w.run({ test: 'livesuccess' })
-      .then((response) => {
         expect(response.src).to.be.equal('lambda');
         expect(response.event.test).to.be.equal('livesuccess');
         done();
-      }).catch(done);
+      });
+    });
+
+    it('can call lambda functions deployed in AWS - promise', (done) => {
+      const w = wrapper.wrap({
+        lambdaFunction: 'lambdaWrapper-test',
+        region: process.env.AWS_DEFAULT_REGION || 'eu-central-1'
+      });
+
+      w.run({ test: 'livesuccess' })
+        .then((response) => {
+          expect(response.src).to.be.equal('lambda');
+          expect(response.event.test).to.be.equal('livesuccess');
+          done();
+        }).catch(done);
+    });
   });
-});
+}
