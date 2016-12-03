@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "RUN_LIVE=true npm run unit-tests",
-    "unit-tests": "mocha"
+    "unit-tests": "./node_modules/.bin/mocha"
   },
   "repository": {
     "type": "git",
