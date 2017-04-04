@@ -67,8 +67,14 @@ class Wrapped {
     });
   }
 
-  run(event, callback) {
-    return this.runHandler(event, {}, callback);
+  run(event, context, callback) {
+    let callbackFunction = callback;
+    if (typeof(context) === 'function') {
+      // backwards compability
+      callbackFunction = context;
+    }
+    const contextObject = context || {};
+    return this.runHandler(event, contextObject, callbackFunction);
   }
 }
 
@@ -91,15 +97,21 @@ module.exports = exports = {
   init: (mod, options) => {
     latest = wrap(mod, options);
   },
-  run: (event, callback) => new Promise((resolve, reject) => {
+  run: (event, context, callback) => new Promise((resolve, reject) => {
+    let callbackFunction = callback;
+    if (typeof(context) === 'function') {
+      // backwards compability
+      callbackFunction = context;
+    }
+    const contextObject = context || {};
     if (typeof latest === typeof undefined) {
       const error = 'Module not initialized';
       reject(error);
-      return callback(error, null);
+      return callbackFunction(error, null);
     }
-    return latest.run(event, (err, data) => {
-      if (callback) {
-        return callback(err, data);
+    return latest.run(event, contextObject, (err, data) => {
+      if (callbackFunction) {
+        return callbackFunction(err, data);
       }
       if (err) {
         return reject(err);
