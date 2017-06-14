@@ -69,11 +69,12 @@ class Wrapped {
 
   run(event, context, callback) {
     let callbackFunction = callback;
+    let contextObject = context;
     if (typeof(context) === 'function') {
       // backwards compability
       callbackFunction = context;
+      contextObject = {};
     }
-    const contextObject = context || {};
     return this.runHandler(event, contextObject, callbackFunction);
   }
 }
