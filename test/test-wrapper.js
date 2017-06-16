@@ -182,6 +182,26 @@ describe('lambda-wrapper local', () => {
       })
       .catch(done);
   });
+
+  it('wrap + run module 5 (custom context) - callback', (done) => {
+    const w = wrapper.wrap(testMod5);
+
+    w.run({ test: 'cbsuccess' }, { functionName: 'testing' }, (err, response) => {
+      expect(response.test).to.be.equal('testing');
+      done();
+    });
+  });
+
+  it('wrap + run module 5 (custom context) - promise', (done) => {
+    const w = wrapper.wrap(testMod5);
+
+    w.run({ test: 'cbsuccess' }, { functionName: 'testing' })
+      .then((response) => {
+        expect(response.test).to.be.equal('testing');
+        done();
+      })
+      .catch(done);
+  });
 });
 
 if (process.env.RUN_LIVE) {
