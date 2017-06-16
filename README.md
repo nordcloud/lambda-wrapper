@@ -46,6 +46,7 @@ to your AWS account as 'lambdaWrapper-test'.
 
 ## Release History
 
+* 2017/07/16 - v0.1.3 - Allow context object in run
 * 2016/10/21 - v0.1.2 - Support for using promises
 * 2016/07/26 - v0.1.1 - Support for alternative handler. runHandler method for passing custom context.
 * 2016/04/26 - v0.1.0 - Support for running lambda functions also from AWS
