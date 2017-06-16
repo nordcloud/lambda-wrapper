@@ -70,7 +70,7 @@ class Wrapped {
   run(event, context, callback) {
     let callbackFunction = callback;
     let contextObject = context;
-    if (typeof(context) === 'function') {
+    if (typeof context === 'function') {
       // backwards compability
       callbackFunction = context;
       contextObject = {};
@@ -100,11 +100,12 @@ module.exports = exports = {
   },
   run: (event, context, callback) => new Promise((resolve, reject) => {
     let callbackFunction = callback;
-    if (typeof(context) === 'function') {
+    let contextObject = context;
+    if (typeof context === 'function') {
       // backwards compability
       callbackFunction = context;
+      contextObject = {};
     }
-    const contextObject = context || {};
     if (typeof latest === typeof undefined) {
       const error = 'Module not initialized';
       reject(error);
