@@ -62,8 +62,7 @@ class Wrapped {
           });
         }
       } catch (ex) {
-        callback(ex);
-        throw (ex);
+        return callback(ex);
       }
     });
   }
