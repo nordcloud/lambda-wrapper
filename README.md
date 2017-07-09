@@ -34,6 +34,8 @@ If you want to pass a custom context to the Lambda module (only when running loc
     lambda.runHandler(event, customContext, callback)
 
 Documentation for valid propreties in the Lambda context object are documented here http://docs.aws.amazon.com/lambda/latest/dg/nodejs-prog-model-context.html
+
+Exceptions from within the module will be returned as errors via the callback / promise.
  
 ## Development
 
@@ -46,7 +48,8 @@ to your AWS account as 'lambdaWrapper-test'.
 
 ## Release History
 
-* 2017/07/16 - v0.1.3 - Allow context object in run
+* 2017/07/09 - v0.2.0 - Return exceptions as errors via callback
+* 2017/06/16 - v0.1.3 - Allow context object in run
 * 2016/10/21 - v0.1.2 - Support for using promises
 * 2016/07/26 - v0.1.1 - Support for alternative handler. runHandler method for passing custom context.
 * 2016/04/26 - v0.1.0 - Support for running lambda functions also from AWS

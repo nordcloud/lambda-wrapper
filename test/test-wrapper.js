@@ -40,6 +40,13 @@ const testMod5 = {
   }
 };
 
+// causes exception
+const testMod6 = {
+  handler: (event, context, callback) => {
+    throw 'TestException';
+  }
+}
+
 describe('lambda-wrapper local', () => {
   it('init + run with success - callback', (done) => {
     wrapper.init(testMod1);
@@ -199,6 +206,20 @@ describe('lambda-wrapper local', () => {
       .then((response) => {
         expect(response.test).to.be.equal('testing');
         done();
+      })
+      .catch(done);
+  });
+  
+  it('wrap + run module 6 - exception', (done) => {
+    const w = wrapper.wrap(testMod6);
+
+    w.run({ test: 'cbsuccess' }, { functionName: 'testing' })
+      .then((response) => {
+        done('Did not return error');
+      }, (error) => {
+        expect(error).to.be.equal('TestException');
+        done();
+        console.log(error);
       })
       .catch(done);
   });
