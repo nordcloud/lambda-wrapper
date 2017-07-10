@@ -57,7 +57,9 @@ class Wrapped {
             if (err) {
               return callback(err);
             }
-
+            if (data.FunctionError) {
+              return callback(Object.assign(new Error(JSON.parse(data.Payload).errorMessage), data));
+            }
             return callback(null, JSON.parse(data.Payload));
           });
         }
