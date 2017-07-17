@@ -12,6 +12,11 @@ class Wrapped {
 
     if (mod[handler]) {
       this.handler = mod[handler];
+    } else {
+      if (!this.lambdaModule.lambdaFunction) {
+        throw new Error("Invalid input. Expected either lambda module (with exposed handler) " +
+          "or AWS Lambda configuration (with provided 'lambdaFunction' name)");
+      }
     }
   }
 
