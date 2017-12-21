@@ -9,23 +9,23 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/SC5/lambda-wrapper.git"
+    "url": "https://github.com/nordcloud/lambda-wrapper.git"
   },
   "keywords": [
     "AWS",
     "lambda",
     "local"
   ],
-  "author": "Mikael Puittinen (mikael.puittinen@sc5.io)",
+  "author": "Mikael Puittinen (https://nordcloud.com)",
   "contributors": [
-    "Toni Ruottu (https://sc5.io)",
-    "Eetu Tuomala (https://sc5.io)"
+    "Toni Ruottu",
+    "Eetu Tuomala"
   ],
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/SC5/lambda-wrapper/issues"
+    "url": "https://github.com/nordcloud/lambda-wrapper/issues"
   },
-  "homepage": "https://github.com/SC5/lambda-wrapper",
+  "homepage": "https://github.com/nordcloud/lambda-wrapper",
   "devDependencies": {
     "chai": "3.5.0",
     "mocha": "2.4.5"

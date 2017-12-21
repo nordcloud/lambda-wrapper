@@ -60,5 +60,5 @@ to your AWS account as 'lambdaWrapper-test'.
 
 ## License
 
-Copyright (c) 2016 [SC5](http://sc5.io/), licensed for users and contributors under MIT license.
-https://github.com/SC5/lambda-wrapper/blob/master/LICENSE
+Copyright (c) 2016 [Nordcloud](https://nordcloud.com/), licensed for users and contributors under MIT license.
+https://github.com/nordcloud/lambda-wrapper/blob/master/LICENSE
