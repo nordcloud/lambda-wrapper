@@ -1,6 +1,6 @@
 # lambda-wrapper
 
-[![Build Status](https://travis-ci.org/SC5/lambda-wrapper.svg?branch=master)](https://travis-ci.org/SC5/lambda-wrapper)
+[![Build Status](https://travis-ci.org/nordcloud/lambda-wrapper.svg?branch=master)](https://travis-ci.org/nordcloud/lambda-wrapper)
 
 Wrapper for running lambda modules locally or from AWS during development
 
