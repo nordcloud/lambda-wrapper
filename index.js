@@ -2,6 +2,8 @@
 
 const AWS = require('aws-sdk');
 
+const httpRunner = require('./httpRunner');
+
 // Wrapper class for AWS Lambda
 class Wrapped {
   constructor(mod, opts) {
@@ -13,6 +15,40 @@ class Wrapped {
     if (mod[handler]) {
       this.handler = mod[handler];
     }
+  }
+
+  runDirect(event, context, cb) {
+    this.handler(event, context, cb);
+  }
+
+  runRemote(event, cb) {
+    if (this.lambdaModule.region) {
+      AWS.config.update({
+        region: this.lambdaModule.region
+      });
+    }
+
+    const lambda = new AWS.Lambda();
+    const params = {
+      FunctionName: this.lambdaModule.lambdaFunction,
+      InvocationType: 'RequestResponse',
+      LogType: 'None',
+      Payload: JSON.stringify(event)
+    };
+
+    lambda.invoke(params, (err, data) => {
+      if (err) {
+        return cb(err);
+      }
+      if (data.FunctionError) {
+        return cb(Object.assign(new Error(JSON.parse(data.Payload).errorMessage), data));
+      }
+      return cb(null, JSON.parse(data.Payload));
+    });
+  }
+
+  runHttp(event, cb) {
+    httpRunner(event, this.lambdaModule, cb);
   }
 
   runHandler(event, customContext, cb) {
@@ -37,31 +73,15 @@ class Wrapped {
 
       try {
         if (this.handler) {
-          this.handler(event, lambdaContext, callback);
-        } else {
-          if (this.lambdaModule.region) {
-            AWS.config.update({
-              region: this.lambdaModule.region
-            });
+          if (isFunction(this.handler)) {
+            this.runDirect(event, lambdaContext, callback);
+          } else {
+            reject('Handler is not a function');
           }
-
-          const lambda = new AWS.Lambda();
-          const params = {
-            FunctionName: this.lambdaModule.lambdaFunction,
-            InvocationType: 'RequestResponse',
-            LogType: 'None',
-            Payload: JSON.stringify(event)
-          };
-
-          lambda.invoke(params, (err, data) => {
-            if (err) {
-              return callback(err);
-            }
-            if (data.FunctionError) {
-              return callback(Object.assign(new Error(JSON.parse(data.Payload).errorMessage), data));
-            }
-            return callback(null, JSON.parse(data.Payload));
-          });
+        } else if (isString(this.lambdaModule)) {
+          this.runHttp(event, callback);
+        } else {
+          this.runRemote(event, callback);
         }
       } catch (ex) {
         return callback(ex);
@@ -79,6 +99,14 @@ class Wrapped {
     }
     return this.runHandler(event, contextObject, callbackFunction);
   }
+}
+
+function isFunction(functionToCheck) {
+  return functionToCheck && {}.toString.call(functionToCheck) === '[object Function]';
+}
+
+function isString(value) {
+  return typeof value === 'string';
 }
 
 // Wrapper factory

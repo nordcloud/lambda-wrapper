@@ -1,6 +1,8 @@
 'use strict';
+const http = require('http');
 
 const wrapper = require('../index.js');
+const httpRunner = require('../httpRunner.js');
 const expect = require('chai').expect;
 
 const testMod1 = {
@@ -222,6 +224,29 @@ describe('lambda-wrapper local', () => {
         console.log(error);
       })
       .catch(done);
+  });
+});
+
+describe('httpRunner', () => {
+  it('can make an http call', function (done) {
+    const port = process.env.PORT || 3101;
+    const url = 'http://localhost:' + port;
+
+    const w = wrapper.wrap(url);
+
+    const requestHandler = (request, response) => {
+      response.end(JSON.stringify({test: 'success'}))
+    };
+
+    const server = http.createServer(requestHandler);
+
+    server.listen(port);
+
+    w.run({ test: 'cbsuccess' }, (error, response) => {
+      expect(response.test).to.be.equal('success');
+
+      server.close(done);
+    })
   });
 });
 
