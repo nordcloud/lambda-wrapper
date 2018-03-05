@@ -2,7 +2,7 @@
 
 [![Build Status](https://travis-ci.org/nordcloud/lambda-wrapper.svg?branch=master)](https://travis-ci.org/nordcloud/lambda-wrapper)
 
-Wrapper for running lambda modules locally or from AWS during development
+Wrapper for running lambda modules locally, remotely via http or from AWS during development
 
 ## Use 
 
@@ -11,6 +11,10 @@ Wrapper for running lambda modules locally or from AWS during development
     // Loads the module in myModule/mymod.js
     var lambdaFunc = require('myModule/mymod.js');
     var lambda = require('lambda-wrapper').wrap(lambdaFunc);
+    
+### Initializing a lambda wrapped by an http server
+
+    var lambda = require('lambda-wrapper').wrap('https://my-lambda-service/');
 
 ### Initializing a lambda in AWS
     
@@ -32,6 +36,11 @@ Wrapper for running lambda modules locally or from AWS during development
 If you want to pass a custom context to the Lambda module (only when running local), use the runHandler method. e.g.
     
     lambda.runHandler(event, customContext, callback)
+
+Accessing a lambda running as a remote service can be useful when calling lambdas that sit in different projects.
+E.g. Node Project A invokes Lambda in Project B. 
+Using e.g. [serverless-offline-direct-lambda](https://github.com/dankelleher/serverless-offline-direct-lambda), 
+the lambda can be wrapped in an http server and called from project A.
 
 Documentation for valid propreties in the Lambda context object are documented here http://docs.aws.amazon.com/lambda/latest/dg/nodejs-prog-model-context.html
 
