@@ -235,7 +235,10 @@ describe('httpRunner', () => {
     const w = wrapper.wrap(url);
 
     const requestHandler = (request, response) => {
-      response.end(JSON.stringify({test: 'success'}))
+      response.end(JSON.stringify({
+        Payload:
+          JSON.stringify({ test: 'success' })
+      }))
     };
 
     const server = http.createServer(requestHandler);
