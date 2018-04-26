@@ -37,7 +37,13 @@ class Wrapped {
 
       try {
         if (this.handler) {
-          this.handler(event, lambdaContext, callback);
+          if (process.version === 'v8.10.0' && !cb) {
+            this.handler(event, lambdaContext).then(function (result) {
+              resolve(result);
+            });
+          } else {
+            this.handler(event, lambdaContext, callback);
+          }
         } else {
           if (this.lambdaModule.region) {
             AWS.config.update({
