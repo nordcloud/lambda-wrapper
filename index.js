@@ -37,7 +37,7 @@ class Wrapped {
 
       try {
         if (this.handler) {
-          if (process.version === 'v8.10.0' && !cb) {
+          if (Number(process.version.match(/^v(\d+\.)?/)[1]) === 8 && !cb) {
             this.handler(event, lambdaContext).then(function (result) {
               resolve(result);
             });
