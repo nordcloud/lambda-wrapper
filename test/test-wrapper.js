@@ -294,5 +294,19 @@ if (process.env.RUN_LIVE) {
           done();
         }).catch(done);
     }).timeout(3000);
+
+    it('can call lambda functions deployed in AWS - async', (done) => {
+      const w = wrapper.wrap({
+        lambdaFunction: 'lambdaWrapper-test',
+        region: process.env.AWS_DEFAULT_REGION || 'us-east-1'
+      });
+
+      w.runAsync({ test: 'livesuccess' })
+        .then((response) => {
+          expect(response.src).to.be.equal('lambda');
+          expect(response.event.test).to.be.equal('livesuccess');
+          done();
+        }).catch(done);
+    }).timeout(3000);
   });
 }
