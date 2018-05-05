@@ -37,7 +37,7 @@ class Wrapped {
 
       try {
         if (this.handler) {
-            this.handler(event, lambdaContext, callback);
+          this.handler(event, lambdaContext, callback);
         } else {
           if (this.lambdaModule.region) {
             AWS.config.update({
