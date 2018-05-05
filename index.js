@@ -37,13 +37,7 @@ class Wrapped {
 
       try {
         if (this.handler) {
-          if (Number(process.version.match(/^v(\d+\.)?/)[1]) === 8 && !cb) {
-            this.handler(event, lambdaContext).then(function (result) {
-              resolve(result);
-            });
-          } else {
             this.handler(event, lambdaContext, callback);
-          }
         } else {
           if (this.lambdaModule.region) {
             AWS.config.update({
@@ -84,6 +78,46 @@ class Wrapped {
       contextObject = {};
     }
     return this.runHandler(event, contextObject, callbackFunction);
+  }
+
+  runAsync(event, context) {
+    return new Promise((resolve, reject) => {
+      try {
+        if (this.handler) {
+          this.handler(event, context).then((data) => {
+            resolve(data);
+          }).catch((err) => {
+            reject(err);
+          });
+        } else {
+          if (this.lambdaModule.region) {
+            AWS.config.update({
+                region: this.lambdaModule.region
+            });
+          }
+
+          const lambda = new AWS.Lambda();
+          const params = {
+            FunctionName: this.lambdaModule.lambdaFunction,
+            InvocationType: 'RequestResponse',
+            LogType: 'None',
+            Payload: JSON.stringify(event)
+          };
+
+          lambda.invoke(params, (err, data) => {
+            if (err) {
+              return reject(err);
+            }
+            if (data.FunctionError) {
+              return resolve(Object.assign(new Error(JSON.parse(data.Payload).errorMessage), data));
+            }
+            return resolve(null, JSON.parse(data.Payload));
+          });
+        }
+      } catch (ex) {
+        return reject(ex);
+      }
+    });
   }
 }
 
@@ -127,6 +161,17 @@ module.exports = exports = {
         return reject(err);
       }
       return resolve(data);
+    });
+  }),
+  runAsync: (event, context) => new Promise((resolve, reject) => {
+    if (typeof latest === typeof undefined) {
+      const error = 'Module not initialized';
+      return reject(new Error(error));
+    }
+    return latest.runAsync(event, context).then((data) => {
+      return resolve(data);
+    }).catch((error) => {
+        reject(error);
     });
   })
 };
