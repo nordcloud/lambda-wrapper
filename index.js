@@ -36,8 +36,22 @@ class Wrapped {
       const lambdaContext = Object.assign({}, defaultContext, customContext);
 
       try {
-        if (this.handler) {
-          this.handler(event, lambdaContext, callback);
+        if (this.handler) { 
+          const handlerResult = this.handler(event, lambdaContext, callback);
+          // Check if the result itself is a promise
+          if (handlerResult && handlerResult.then) {
+            handlerResult.then(function(data) {
+              // Avoid Maximum call stack size exceeded exceptions
+              return setImmediate(function() {
+                callback(null, data);
+              });
+            }).catch(function(err) {
+               // Avoid Maximum call stack size exceeded exceptions
+               return setImmediate(function() {
+                callback(err);
+              });
+            });
+          }
         } else {
           if (this.lambdaModule.region) {
             AWS.config.update({

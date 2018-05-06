@@ -3,6 +3,8 @@
 const wrapper = require('../index.js');
 const expect = require('chai').expect;
 
+const SUPPORTS_ASYNC = Number(process.versions.node.split('.', 1)[0]) >= 8;
+
 const testMod1 = {
   handler: (event, context) => {
     if (event.test === 'success') {
@@ -223,6 +225,48 @@ describe('lambda-wrapper local', () => {
       })
       .catch(done);
   });
+
+  if (SUPPORTS_ASYNC) {
+    const testMod7 = {
+      handler: async (event, context) => {
+        if (event.test === 'success') {
+          return 'Success';
+        }
+        if (event.test === 'fail') {
+          throw new Error('Fail');
+        }
+      }
+    };
+
+    it('wrap + run async module 7 - await', async () => {
+      const w = wrapper.wrap(testMod7);
+
+      const response = await w.run({test: 'success'});
+      expect(response).to.be.equal('Success');
+    });
+
+    it('wrap + run async module 7 - promise', (done) => {
+      const w = wrapper.wrap(testMod7);
+  
+      w.run({test: 'success'})
+        .then((response) => {
+          expect(response).to.be.equal('Success');
+          done();
+        })
+        .catch(done);
+    });
+
+    it('wrap + run async module 7 - exception', async () => {
+      const w = wrapper.wrap(testMod7);
+
+      try {
+       const response = await w.run({test: 'fail'});
+       expect(response).to.be.null;
+      } catch(err) {
+        expect(err).to.be.instanceof(Error);
+      }
+    });
+  }
 });
 
 if (process.env.RUN_LIVE) {
