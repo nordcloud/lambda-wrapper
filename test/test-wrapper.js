@@ -45,9 +45,46 @@ const testMod6 = {
   handler: (event, context, callback) => {
     throw 'TestException';
   }
-}
+};
+
+// returns promise
+const testMod7 = {
+  handler: (event) => {
+    if (event.test === 'success') {
+      return Promise.resolve('Success');
+    }
+    if (event.test === 'fail') {
+      return Promise.reject(new Error('Fail'));
+    }
+  }
+};
 
 describe('lambda-wrapper local', () => {
+  it('init + runAsync with success', (done) => {
+    wrapper.init(testMod7);
+
+    wrapper.runAsync({test: 'success'})
+    .then((response) => {
+      expect(response).to.be.equal('Success');
+      done();
+    })
+    .catch(done);
+  });
+
+  it('init + runAsync with failure', (done) => {
+    wrapper.init(testMod7);
+
+    wrapper.runAsync({test: 'fail'}).then(() => {
+      done(new Error('Expected method to reject.'))
+    })
+    .catch(err => {
+      expect(err).to.be.an('error');
+      expect(err.message).to.be.equal('Fail');
+      done()
+    })
+    .catch(done);
+  });
+
   it('init + run with success - callback', (done) => {
     wrapper.init(testMod1);
 
@@ -209,7 +246,7 @@ describe('lambda-wrapper local', () => {
       })
       .catch(done);
   });
-  
+
   it('wrap + run module 6 - exception', (done) => {
     const w = wrapper.wrap(testMod6);
 
@@ -251,6 +288,20 @@ if (process.env.RUN_LIVE) {
       });
 
       w.run({ test: 'livesuccess' })
+        .then((response) => {
+          expect(response.src).to.be.equal('lambda');
+          expect(response.event.test).to.be.equal('livesuccess');
+          done();
+        }).catch(done);
+    }).timeout(3000);
+
+    it('can call lambda functions deployed in AWS - async', (done) => {
+      const w = wrapper.wrap({
+        lambdaFunction: 'lambdaWrapper-test',
+        region: process.env.AWS_DEFAULT_REGION || 'us-east-1'
+      });
+
+      w.runAsync({ test: 'livesuccess' })
         .then((response) => {
           expect(response.src).to.be.equal('lambda');
           expect(response.event.test).to.be.equal('livesuccess');
