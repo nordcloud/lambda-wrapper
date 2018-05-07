@@ -3,6 +3,8 @@
 const wrapper = require('../index.js');
 const expect = require('chai').expect;
 
+const SUPPORTS_ASYNC = Number(process.versions.node.split('.', 1)[0]) >= 8;
+
 const testMod1 = {
   handler: (event, context) => {
     if (event.test === 'success') {
@@ -223,6 +225,10 @@ describe('lambda-wrapper local', () => {
       })
       .catch(done);
   });
+
+  if (SUPPORTS_ASYNC) {
+    require('./async/async-wrapper');
+  }
 });
 
 if (process.env.RUN_LIVE) {
