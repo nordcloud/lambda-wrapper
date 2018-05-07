@@ -48,6 +48,7 @@ to your AWS account as 'lambdaWrapper-test'.
 
 ## Release History
 
+* 2018/05/07 - v0.3.0 - Support for async calls, improved input validation 
 * 2017/07/09 - v0.2.0 - Return exceptions as errors via callback
 * 2017/06/16 - v0.1.3 - Allow context object in run
 * 2016/10/21 - v0.1.2 - Support for using promises
